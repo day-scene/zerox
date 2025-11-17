@@ -75,11 +75,17 @@ export interface OpenAICredentials {
   apiKey: string;
 }
 
+export interface PoeCredentials {
+  apiKey: string;
+  proxy?: string;
+}
+
 export type ModelCredentials =
   | AzureCredentials
   | BedrockCredentials
   | GoogleCredentials
-  | OpenAICredentials;
+  | OpenAICredentials
+  | PoeCredentials;
 
 export enum ModelOptions {
   // Bedrock Claude 3 Models
@@ -110,6 +116,7 @@ export enum ModelProvider {
   BEDROCK = "BEDROCK",
   GOOGLE = "GOOGLE",
   OPENAI = "OPENAI",
+  POE = "POE",
 }
 
 export enum OperationMode {
@@ -225,12 +232,18 @@ export interface OpenAILLMParams extends BaseLLMParams {
   maxTokens: number;
 }
 
+export interface PoeLLMParams extends BaseLLMParams {
+  logprobs: boolean;
+  maxTokens: number;
+}
+
 // Union type of all provider params
 export type LLMParams =
   | AzureLLMParams
   | BedrockLLMParams
   | GoogleLLMParams
-  | OpenAILLMParams;
+  | OpenAILLMParams
+  | PoeLLMParams;
 
 export interface LogprobPage {
   page: number | null;
