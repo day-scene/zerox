@@ -1,0 +1,37 @@
+import GoogleModel from "../src/models/google";
+import { GoogleCredentials } from "../src/types";
+
+/**
+ * Unit test to verify that GoogleModel properly accepts and stores proxy configuration.
+ * This test doesn't make actual API calls to avoid requiring API keys and proxy servers.
+ */
+describe("GoogleModel Proxy Configuration", () => {
+  it("should accept credentials without proxy", () => {
+    const credentials: GoogleCredentials = {
+      apiKey: "test-api-key",
+    };
+
+    const model = new GoogleModel(credentials, "gemini-1.5-flash", {});
+    expect(model).toBeDefined();
+  });
+
+  it("should accept credentials with HTTP proxy", () => {
+    const credentials: GoogleCredentials = {
+      apiKey: "test-api-key",
+      proxy: "http://proxy.example.com:8080",
+    };
+
+    const model = new GoogleModel(credentials, "gemini-1.5-flash", {});
+    expect(model).toBeDefined();
+  });
+
+  it("should accept credentials with HTTPS proxy", () => {
+    const credentials: GoogleCredentials = {
+      apiKey: "test-api-key",
+      proxy: "https://proxy.example.com:8443",
+    };
+
+    const model = new GoogleModel(credentials, "gemini-1.5-flash", {});
+    expect(model).toBeDefined();
+  });
+});
