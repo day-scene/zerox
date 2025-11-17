@@ -277,6 +277,17 @@ const geminiResult = await zerox({
     apiKey: process.env.GEMINI_API_KEY,
   },
 });
+
+// Google Gemini with proxy
+const geminiWithProxyResult = await zerox({
+  filePath: "path/to/file.pdf",
+  modelProvider: ModelProvider.GOOGLE,
+  model: ModelOptions.GOOGLE_GEMINI_1_5_PRO,
+  credentials: {
+    apiKey: process.env.GEMINI_API_KEY,
+    proxy: "http://proxy.example.com:8080", // Optional: HTTP/HTTPS proxy URL
+  },
+});
 ```
 
 ## Python Zerox
