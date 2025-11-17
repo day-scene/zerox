@@ -87,6 +87,14 @@ const providerDefaultParams: Record<ModelProvider | string, LLMParams> = {
     temperature: 0,
     topP: 1,
   },
+  [ModelProvider.POE]: {
+    frequencyPenalty: 0,
+    logprobs: false,
+    maxTokens: 4000,
+    presencePenalty: 0,
+    temperature: 0,
+    topP: 1,
+  },
 };
 
 export const validateLLMParams = <T extends LLMParams>(
