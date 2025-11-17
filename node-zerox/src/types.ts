@@ -68,6 +68,7 @@ export interface BedrockCredentials {
 
 export interface GoogleCredentials {
   apiKey: string;
+  proxy?: string;
 }
 
 export interface OpenAICredentials {

@@ -17,11 +17,13 @@ import {
 import { CONSISTENCY_PROMPT, SYSTEM_PROMPT_BASE } from "../constants";
 import { GoogleGenAI, createPartFromBase64 } from "@google/genai";
 import fs from "fs-extra";
+import { ProxyAgent, setGlobalDispatcher, getGlobalDispatcher } from "undici";
 
 export default class GoogleModel implements ModelInterface {
   private client: GoogleGenAI;
   private model: string;
   private llmParams?: Partial<GoogleLLMParams>;
+  private originalDispatcher?: any;
 
   constructor(
     credentials: GoogleCredentials,
@@ -31,6 +33,13 @@ export default class GoogleModel implements ModelInterface {
     this.client = new GoogleGenAI({ apiKey: credentials.apiKey });
     this.model = model;
     this.llmParams = llmParams;
+
+    // Configure proxy if provided
+    if (credentials.proxy) {
+      this.originalDispatcher = getGlobalDispatcher();
+      const proxyAgent = new ProxyAgent(credentials.proxy);
+      setGlobalDispatcher(proxyAgent);
+    }
   }
 
   async getCompletion(
