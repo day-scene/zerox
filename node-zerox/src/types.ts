@@ -36,6 +36,7 @@ export interface ZeroxArgs {
   modelProvider?: ModelProvider | string;
   openaiAPIKey?: string;
   outputDir?: string;
+  outputFilename?: string;
   pagesToConvertAsImages?: number | number[];
   prompt?: string;
   schema?: Record<string, unknown>;

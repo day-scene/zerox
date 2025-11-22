@@ -43,6 +43,20 @@ import {
 } from "./types";
 import { NUM_STARTING_WORKERS } from "./constants";
 
+/**
+ * Sanitizes a filename to prevent filesystem errors
+ * @param filename - The filename to sanitize
+ * @returns Sanitized filename with special characters removed, lowercase, max 255 chars
+ */
+const sanitizeFilename = (filename: string): string => {
+  return filename
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, "_")
+    .toLowerCase()
+    .substring(0, 255); // Truncate to 255 characters to prevent ENAMETOOLONG errors
+};
+
+
 export const zerox = async ({
   cleanup = true,
   concurrency = 10,
@@ -72,6 +86,7 @@ export const zerox = async ({
   modelProvider = ModelProvider.OPENAI,
   openaiAPIKey = "",
   outputDir,
+  outputFilename,
   pagesToConvertAsImages = -1,
   prompt,
   schema,
@@ -140,7 +155,9 @@ export const zerox = async ({
 
   try {
     // Ensure temp directory exists + create temp folder
-    const rand = Math.floor(1000 + Math.random() * 9000).toString();
+    const rand = outputFilename 
+      ? sanitizeFilename(outputFilename)
+      : Math.floor(1000 + Math.random() * 9000).toString();
     const tempDirectory = path.join(
       tempDir || os.tmpdir(),
       `zerox-temp-${rand}`
@@ -555,11 +572,9 @@ export const zerox = async ({
     // Write the aggregated markdown to a file
     const endOfPath = localPath.split("/")[localPath.split("/").length - 1];
     const rawFileName = endOfPath.split(".")[0];
-    const fileName = rawFileName
-      .replace(/[^\w\s]/g, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase()
-      .substring(0, 255); // Truncate file name to 255 characters to prevent ENAMETOOLONG errors
+    
+    // Sanitize the filename whether it's provided or generated
+    const fileName = sanitizeFilename(outputFilename || rawFileName);
 
     if (outputDir) {
       const resultFilePath = path.join(outputDir, `${fileName}.md`);
@@ -611,3 +626,16 @@ export const zerox = async ({
     }
   }
 };
+
+// Re-export types for easier consumption
+export type {
+  ZeroxArgs,
+  ZeroxOutput,
+  ModelOptions,
+  ModelProvider,
+  Page,
+  CompletionResponse,
+  ExtractionResponse,
+  ErrorMode,
+} from "./types";
+

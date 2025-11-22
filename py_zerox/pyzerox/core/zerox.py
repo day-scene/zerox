@@ -1,4 +1,5 @@
 import os
+import re
 import aioshutil as async_shutil
 import tempfile
 import warnings
@@ -23,6 +24,25 @@ from ..models import litellmmodel
 from .types import Page, ZeroxOutput
 
 
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitizes a filename to prevent filesystem errors.
+    Removes special characters, converts to lowercase, and truncates to 255 characters.
+    
+    Args:
+        filename: The filename to sanitize
+        
+    Returns:
+        Sanitized filename
+    """
+    # Replace non-alphanumeric characters (except spaces) with empty string
+    # Then replace spaces with underscores, convert to lowercase, and truncate
+    sanitized = re.sub(r'[^\w\s]', '', filename)
+    sanitized = re.sub(r'\s+', '_', sanitized)
+    sanitized = sanitized.lower()
+    return sanitized[:255]  # Truncate to 255 characters to prevent ENAMETOOLONG errors
+
+
 async def zerox(
     cleanup: bool = True,
     concurrency: int = 10,
@@ -32,6 +52,7 @@ async def zerox(
     maintain_format: bool = False,
     model: str = "gpt-4o-mini",
     output_dir: Optional[str] = None,
+    output_filename: Optional[str] = None,
     temp_dir: Optional[str] = None,
     custom_system_prompt: Optional[str] = None,
     select_pages: Optional[Union[int, Iterable[int]]] = None,
@@ -53,6 +74,8 @@ async def zerox(
     :type model: str, optional
     :param output_dir: The directory to save the markdown output, defaults to None
     :type output_dir: str, optional
+    :param output_filename: The filename to use for output files instead of generating from input file, defaults to None
+    :type output_filename: str, optional
     :param temp_dir: The directory to store temporary files, defaults to some named folder in system's temp directory. If already exists, the contents will be deleted for zerox uses it.
     :type temp_dir: str, optional
     :param custom_system_prompt: The system prompt to use for the model, this overrides the default system prompt of zerox. Generally it is not required unless you want some specific behaviour. When set, it will raise a friendly warning, defaults to None
@@ -120,10 +143,12 @@ async def zerox(
         if not local_path:
             raise FileUnavailable()
         
-        raw_file_name = os.path.splitext(os.path.basename(local_path))[0]
-        file_name = "".join(c.lower() if c.isalnum() else "_" for c in raw_file_name)
-        # Truncate file name to 255 characters to prevent ENAMETOOLONG errors
-        file_name = file_name[:255]
+        # Sanitize the filename whether it's provided or generated
+        if output_filename:
+            file_name = sanitize_filename(output_filename)
+        else:
+            raw_file_name = os.path.splitext(os.path.basename(local_path))[0]
+            file_name = sanitize_filename(raw_file_name)
 
         # create a subset pdf in temp dir with only the requested pages if select_pages is provided
         if select_pages is not None:

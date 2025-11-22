@@ -124,6 +124,7 @@ const result = await zerox({
   model: ModelOptions.OPENAI_GPT_4O, // Model to use (supports various models from different providers)
   modelProvider: ModelProvider.OPENAI, // Choose from OPENAI, BEDROCK, GOOGLE, or AZURE
   outputDir: undefined, // Save combined result.md to a file
+  outputFilename: undefined, // Custom filename for output and temp files instead of randomly generated name
   pagesToConvertAsImages: -1, // Page numbers to convert to image as array (e.g. `[1, 2, 3]`) or a number (e.g. `1`). Set to -1 to convert all pages
   prompt: "", // LLM instructions for processing the document
   schema: undefined, // Schema for structured data extraction
@@ -399,6 +400,7 @@ async def zerox(
     maintain_format: bool = False,
     model: str = "gpt-4o-mini",
     output_dir: Optional[str] = None,
+    output_filename: Optional[str] = None,
     temp_dir: Optional[str] = None,
     custom_system_prompt: Optional[str] = None,
     select_pages: Optional[Union[int, Iterable[int]]] = None,
@@ -422,6 +424,8 @@ Parameters
   Refer to LiteLLM Providers for the correct model name, as it may differ depending on the provider.
 - **output_dir** (Optional[str], optional):
   The directory to save the markdown output. Defaults to None.
+- **output_filename** (Optional[str], optional):
+  Custom filename for output and temp files instead of randomly generated name. Defaults to None.
 - **temp_dir** (str, optional):
   The directory to store temporary files, defaults to some named folder in system's temp directory. If already exists, the contents will be deleted before Zerox uses it.
 - **custom_system_prompt** (str, optional):
