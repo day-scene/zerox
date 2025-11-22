@@ -626,3 +626,16 @@ export const zerox = async ({
     }
   }
 };
+
+// Re-export types for easier consumption
+export type {
+  ZeroxArgs,
+  ZeroxOutput,
+  ModelOptions,
+  ModelProvider,
+  Page,
+  CompletionResponse,
+  ExtractionResponse,
+  ErrorMode,
+} from "./types";
+

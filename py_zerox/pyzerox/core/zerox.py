@@ -1,4 +1,5 @@
 import os
+import re
 import aioshutil as async_shutil
 import tempfile
 import warnings
@@ -36,7 +37,6 @@ def sanitize_filename(filename: str) -> str:
     """
     # Replace non-alphanumeric characters (except spaces) with empty string
     # Then replace spaces with underscores, convert to lowercase, and truncate
-    import re
     sanitized = re.sub(r'[^\w\s]', '', filename)
     sanitized = re.sub(r'\s+', '_', sanitized)
     sanitized = sanitized.lower()

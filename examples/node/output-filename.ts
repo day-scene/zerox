@@ -1,5 +1,5 @@
 import { zerox } from "zerox";
-import { ModelOptions } from "zerox/node-zerox/dist/types";
+import { ModelOptions } from "zerox";
 import path from "path";
 
 /**
