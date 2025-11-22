@@ -23,6 +23,26 @@ from ..models import litellmmodel
 from .types import Page, ZeroxOutput
 
 
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitizes a filename to prevent filesystem errors.
+    Removes special characters, converts to lowercase, and truncates to 255 characters.
+    
+    Args:
+        filename: The filename to sanitize
+        
+    Returns:
+        Sanitized filename
+    """
+    # Replace non-alphanumeric characters (except spaces) with empty string
+    # Then replace spaces with underscores, convert to lowercase, and truncate
+    import re
+    sanitized = re.sub(r'[^\w\s]', '', filename)
+    sanitized = re.sub(r'\s+', '_', sanitized)
+    sanitized = sanitized.lower()
+    return sanitized[:255]  # Truncate to 255 characters to prevent ENAMETOOLONG errors
+
+
 async def zerox(
     cleanup: bool = True,
     concurrency: int = 10,
@@ -125,14 +145,10 @@ async def zerox(
         
         # Sanitize the filename whether it's provided or generated
         if output_filename:
-            file_name = "".join(c.lower() if c.isalnum() else "_" for c in output_filename)
-            # Truncate file name to 255 characters to prevent ENAMETOOLONG errors
-            file_name = file_name[:255]
+            file_name = sanitize_filename(output_filename)
         else:
             raw_file_name = os.path.splitext(os.path.basename(local_path))[0]
-            file_name = "".join(c.lower() if c.isalnum() else "_" for c in raw_file_name)
-            # Truncate file name to 255 characters to prevent ENAMETOOLONG errors
-            file_name = file_name[:255]
+            file_name = sanitize_filename(raw_file_name)
 
         # create a subset pdf in temp dir with only the requested pages if select_pages is provided
         if select_pages is not None:
