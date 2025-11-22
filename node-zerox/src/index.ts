@@ -72,6 +72,7 @@ export const zerox = async ({
   modelProvider = ModelProvider.OPENAI,
   openaiAPIKey = "",
   outputDir,
+  outputFilename,
   pagesToConvertAsImages = -1,
   prompt,
   schema,
@@ -140,7 +141,7 @@ export const zerox = async ({
 
   try {
     // Ensure temp directory exists + create temp folder
-    const rand = Math.floor(1000 + Math.random() * 9000).toString();
+    const rand = outputFilename || Math.floor(1000 + Math.random() * 9000).toString();
     const tempDirectory = path.join(
       tempDir || os.tmpdir(),
       `zerox-temp-${rand}`
@@ -555,7 +556,7 @@ export const zerox = async ({
     // Write the aggregated markdown to a file
     const endOfPath = localPath.split("/")[localPath.split("/").length - 1];
     const rawFileName = endOfPath.split(".")[0];
-    const fileName = rawFileName
+    const fileName = outputFilename || rawFileName
       .replace(/[^\w\s]/g, "")
       .replace(/\s+/g, "_")
       .toLowerCase()
