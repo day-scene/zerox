@@ -556,11 +556,22 @@ export const zerox = async ({
     // Write the aggregated markdown to a file
     const endOfPath = localPath.split("/")[localPath.split("/").length - 1];
     const rawFileName = endOfPath.split(".")[0];
-    const fileName = outputFilename || rawFileName
-      .replace(/[^\w\s]/g, "")
-      .replace(/\s+/g, "_")
-      .toLowerCase()
-      .substring(0, 255); // Truncate file name to 255 characters to prevent ENAMETOOLONG errors
+    
+    // Sanitize the filename whether it's provided or generated
+    let fileName: string;
+    if (outputFilename) {
+      fileName = outputFilename
+        .replace(/[^\w\s]/g, "")
+        .replace(/\s+/g, "_")
+        .toLowerCase()
+        .substring(0, 255); // Truncate file name to 255 characters to prevent ENAMETOOLONG errors
+    } else {
+      fileName = rawFileName
+        .replace(/[^\w\s]/g, "")
+        .replace(/\s+/g, "_")
+        .toLowerCase()
+        .substring(0, 255); // Truncate file name to 255 characters to prevent ENAMETOOLONG errors
+    }
 
     if (outputDir) {
       const resultFilePath = path.join(outputDir, `${fileName}.md`);

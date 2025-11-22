@@ -18,7 +18,7 @@ async function testOutputFilename() {
   await fs.ensureDir(testOutputDir);
 
   try {
-    // Test with a simple image URL
+    // Test 1: Basic custom filename
     const result = await zerox({
       cleanup: true,
       filePath: "https://omni-demo-data.s3.amazonaws.com/test/cs101.pdf",
@@ -44,9 +44,36 @@ async function testOutputFilename() {
       throw new Error(`Expected output file not found: ${expectedFilePath}`);
     }
 
-    console.log("✅ Test passed: outputFilename parameter works correctly");
+    console.log("✅ Test 1 passed: outputFilename parameter works correctly");
     console.log(`  - Result fileName: ${result.fileName}`);
     console.log(`  - Output file created: ${expectedFilePath}`);
+
+    // Test 2: Filename with special characters (should be sanitized)
+    const unsafeFilename = "test@file#name!123";
+    const expectedSanitized = "testfilename123"; // After sanitization
+    
+    const result2 = await zerox({
+      cleanup: true,
+      filePath: "https://omni-demo-data.s3.amazonaws.com/test/cs101.pdf",
+      credentials: {
+        apiKey: process.env.OPENAI_API_KEY || "",
+      },
+      model: ModelOptions.OPENAI_GPT_4O_MINI,
+      outputDir: testOutputDir,
+      outputFilename: unsafeFilename,
+      pagesToConvertAsImages: 1,
+    });
+
+    if (result2.fileName !== expectedSanitized) {
+      throw new Error(
+        `Expected sanitized fileName to be "${expectedSanitized}", but got "${result2.fileName}"`
+      );
+    }
+
+    console.log("✅ Test 2 passed: filename sanitization works correctly");
+    console.log(`  - Input: "${unsafeFilename}"`);
+    console.log(`  - Sanitized: "${result2.fileName}"`);
+
 
     // Verify temp directory naming (check if any temp dir with custom name exists)
     const tempDirs = fs.readdirSync(os.tmpdir()).filter(dir => 

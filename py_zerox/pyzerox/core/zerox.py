@@ -123,8 +123,11 @@ async def zerox(
         if not local_path:
             raise FileUnavailable()
         
+        # Sanitize the filename whether it's provided or generated
         if output_filename:
-            file_name = output_filename
+            file_name = "".join(c.lower() if c.isalnum() else "_" for c in output_filename)
+            # Truncate file name to 255 characters to prevent ENAMETOOLONG errors
+            file_name = file_name[:255]
         else:
             raw_file_name = os.path.splitext(os.path.basename(local_path))[0]
             file_name = "".join(c.lower() if c.isalnum() else "_" for c in raw_file_name)
